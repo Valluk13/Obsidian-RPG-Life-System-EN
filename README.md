@@ -1,10 +1,7 @@
 # 🗡️ Obsidian RPG Life Management System
 Turn your life, habits, and learning into a full-fledged RPG game directly inside your Obsidian vault. 
 
-[Читать на русском (Russian Version)](README_RU.md)
-
 ---
-
 ## 1. System Architecture
 
 The system is designed as a decoupled architecture within Obsidian:
@@ -12,7 +9,6 @@ The system is designed as a decoupled architecture within Obsidian:
 * **Interface Layer (Frontend):** Dynamic interactive widgets built using `DataviewJS` and asynchronous HTML/CSS rendering that react to internal system events (`CustomEvent`).
 
 ---
-
 ## 2. Core Loop
 
 Every real-world action is logged through Obsidian interfaces and instantly converted into numerical character attributes: Experience (XP), Gold Points (GP), and Health Points (HP).
@@ -110,12 +106,16 @@ inventory:                 # Current stock of purchased items
 archive_cutoff: "2000-01-01" # Date filter for the Board of Debts
 ---
 ```
+
+---
 ## 5. Quick Start 
 1. Download the repository archive and extract it to a local folder.
 2. Open Obsidian, click "Open folder as vault", and select the extracted directory.
 3. Navigate to Obsidian Settings -> Community Plugins and ensure that Dataview, CustomJS, and Templater are enabled.
 4. In the Dataview settings, strictly enable: "Enable JavaScript Queries" and "Enable Inline JavaScript Queries".
 5. Open the 01_Dashboard/Homepage.md file. The system is ready to use.
+
+---
 ## 6. License & Support 
 You can modify the core math in `99_System/Scripts/RPG_Engine.js` to fit your needs.
 If this engine helped you organize your life and beat procrastination, feel free to support the developer:
