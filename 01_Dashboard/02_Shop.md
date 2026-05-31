@@ -1,6 +1,3 @@
----
-unlocked_badges: []
----
 # Balance
 ```dataviewjs
 (async () => {
@@ -30,23 +27,28 @@ unlocked_badges: []
         balanceSpan.innerText = `💰 Balance: ${currentGold} GP`;
 
         const updateBalanceUI = (e) => {
+            if (!balanceSpan || !document.body.contains(balanceSpan)) return;
             const newGold = e.detail.gold;
             balanceSpan.innerText = `💰 Balance: ${newGold} GP`;
             balanceSpan.className = `shop-balance ${newGold >= 0 ? 'balance-positive' : 'balance-negative'}`;
         };
 
-        if (window.rpgWalletListener) {
-            window.removeEventListener('rpg-balance-updated', window.rpgWalletListener);
-        }
+        if (window.rpgWalletListener) window.removeEventListener('rpg-balance-updated', window.rpgWalletListener);
         window.rpgWalletListener = updateBalanceUI;
         window.addEventListener('rpg-balance-updated', window.rpgWalletListener);
 
+        this.onunload = () => {
+            if (window.rpgWalletListener) {
+                window.removeEventListener('rpg-balance-updated', window.rpgWalletListener);
+                window.rpgWalletListener = null;
+            }
+        };
     } catch(e) {
-        container.createEl('p', {text: "Wallet connection error: " + e.message, attr: {style: "color:red;"}});
+        container.createEl('p', {text: "Wallet Loading Error: " + e.message, attr: {style: "color:red;"}});
     }
 })();
 ```
-# Marketplace 
+# Shop
 ```dataviewjs
 (async () => {
     const container = this.container;
@@ -87,7 +89,7 @@ unlocked_badges: []
             
             const controls = card.createEl('div', {cls: 'shop-controls'});
             const qtyInput = controls.createEl('input', {type: 'number', value: '1', min: '1', max: '99', cls: 'qty-input'});
-            const buyBtn = controls.createEl('button', {text: 'Purchase', cls: 'shop-btn'});
+            const buyBtn = controls.createEl('button', {text: 'Buy', cls: 'shop-btn'});
             
             const updateBtnState = () => {
                 let qty = parseInt(qtyInput.value) || 1;
@@ -102,7 +104,7 @@ unlocked_badges: []
                     buyBtn.innerText = 'On Credit';
                     buyBtn.disabled = false;
                 } else {
-                    buyBtn.innerText = 'Purchase';
+                    buyBtn.innerText = 'Buy';
                     buyBtn.disabled = false;
                 }
             };
@@ -111,20 +113,15 @@ unlocked_badges: []
             updateBtnState(); 
 
             buyBtn.addEventListener('click', async () => {
-                if (window.isRPGTransactionActive) return;
-                window.isRPGTransactionActive = true;
                 buyBtn.disabled = true;
-                
                 let qty = parseInt(qtyInput.value) || 1;
                 let totalCost = item.cost * qty;
                 
                 if (currentGold - totalCost < creditLimit) {
-                    new Notice(`❌ Debt Limit Exceeded (${creditLimit} GP)!`);
+                    new Notice(`❌ Credit limit exceeded (${creditLimit} GP)!`);
                     buyBtn.disabled = false;
-                    window.isRPGTransactionActive = false;
                     return;
                 }
-                
                 buyBtn.innerText = "⏳...";
                 
                 try {
@@ -135,23 +132,24 @@ unlocked_badges: []
                     });
                     
                     currentGold -= totalCost;
+                    
                     window.dispatchEvent(new CustomEvent('rpg-balance-updated', { detail: { gold: currentGold } }));
-
+                    
+                    engine.invalidateCache();
+                    
                     new Notice('✅ Purchased: ' + item.name + ' (x' + qty + ')');
-                } catch (e) {
-                    new Notice('Transaction Error: ' + e.message);
-                } finally {
-                    setTimeout(() => {
-                        if (buyBtn && document.body.contains(buyBtn)) {
-                            updateBtnState();
-                        }
-                        window.isRPGTransactionActive = false;
-                    }, 1000);
+                    
+                    setTimeout(() => { if (buyBtn && document.body.contains(buyBtn)) updateBtnState(); }, 200);
+
+                } catch (err) {
+                    new Notice("❌ Error during purchase: " + err.message);
+                    buyBtn.disabled = false;
+                    updateBtnState();
                 }
             });
         }
     } catch(e) {
-        container.createEl('p', {text: "Shop module error: " + e.message, attr: {style: "color:red;"}});
+        container.createEl('p', {text: "Shop Error: " + e.message, attr: {style: "color:red;"}});
     }
 })();
 ```

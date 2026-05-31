@@ -1,8 +1,8 @@
 ---
+banner: "[https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&w=1400&q=80](https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&w=1400&q=80)"
 banner_y: 0.5
-banner: https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&w=1400&q=80
 ---
-## 🏰 Citadel of Control
+## 🏰 Command Citadel
 ```dataviewjs
 (async () => {
     const container = this.container;
@@ -46,7 +46,7 @@ banner: https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format
             .hud-bar { display: flex; flex-direction: column; gap: 4px; }
             .hud-label { display: flex; justify-content: space-between; font-size: 0.8em; font-weight: bold; text-transform: uppercase; color: var(--text-muted); }
             .hud-bg { background: rgba(0,0,0,0.3); height: 10px; border-radius: 5px; overflow: hidden; border: 1px solid rgba(255,255,255,0.03); }
-            .hud-fill { height: 100%; transition: width 0.4s ease; }
+            .hud-fill { height: 100%; transition: width 0.4s ease, background-color 0.4s ease; }
             .heal-trigger-btn { background: rgba(46, 204, 113, 0.08); border: 1px dashed rgba(46, 204, 113, 0.3); color: #2ecc71; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 0.9em; cursor: pointer; transition: 0.15s; text-align: center; width: 100%; box-sizing: border-box; box-shadow: none !important; }
             .heal-trigger-btn:hover:not(:disabled) { background: #2ecc71; color: black; border-style: solid; }
             .heal-trigger-btn:disabled { opacity: 0.25; cursor: not-allowed; }
@@ -116,23 +116,23 @@ banner: https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format
         const xpBg = xpGroup.createEl('div', { cls: 'hud-bg' });
         xpBg.createEl('div', { cls: 'hud-fill', attr: { style: `width: ${ctx.progressPercent}%; background: #3498db;` } });
 
-        const profileCache = app.metadataCache.getFileCache(profilePage);
+        const profileCache = app.metadataCache.getFileCache(profileFile);
         const potionsCount = profileCache?.frontmatter?.inventory?.potion || 0;
         
         const healBtn = heroPanel.createEl('button', { cls: 'heal-trigger-btn' });
         if (ctx.currentHp >= 100) {
-            healBtn.innerText = `🟢 Health Fully Restored`;
+            healBtn.innerText = `🟢 Health fully restored`;
             healBtn.disabled = true;
         } else if (potionsCount <= 0) {
-            healBtn.innerText = `🧪 No healing potions available`;
+            healBtn.innerText = `🧪 No healing potions`;
             healBtn.disabled = true;
         } else {
-            healBtn.innerText = `🧪 Drink healing potion (${potionsCount} in stock)`;
+            healBtn.innerText = `🧪 Use Healing Potion (${potionsCount} in stock)`;
         }
         
         healBtn.addEventListener('click', async () => {
             healBtn.disabled = true;
-            healBtn.innerText = "⏳ Committing...";
+            healBtn.innerText = "⏳ Applying...";
             try {
                 await app.fileManager.processFrontMatter(profileFile, (f) => {
                     if (f.inventory && f.inventory.potion > 0) {
@@ -141,19 +141,33 @@ banner: https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format
                         f.potions_history[todayStr] = (parseInt(f.potions_history[todayStr]) || 0) + 1;
                     }
                 });
+                
+                engine.invalidateCache(); 
+                
+                const newHp = Math.min(100, ctx.currentHp + 25);
+                hpBg.querySelector('.hud-fill').style.width = `${newHp}%`;
+                hpLabels.querySelectorAll('span')[1].innerText = `${newHp}/100`;
+                
+                if (newHp > 50) hpBg.querySelector('.hud-fill').style.background = '#2ed573';
+                else if (newHp > 20) hpBg.querySelector('.hud-fill').style.background = '#ffa502';
+
                 new Notice("✅ Health successfully restored!");
             } catch(err) {
-                new Notice("Error: " + err.message);
+                new Notice("Application error: " + err.message);
                 healBtn.disabled = false;
+            } finally {
+                setTimeout(() => {
+                    if (healBtn && document.body.contains(healBtn)) healBtn.innerText = "✅ Used";
+                }, 500);
             }
         });
 
         const navRow = root.createEl('div', { cls: 'nav-row' });
         const links = [
-            { path: "01_Dashboard/00_Profile.md", icon: "👤", title: "Cabinet", stat: "Analytics" },
-            { path: "01_Dashboard/01_Hall_of_Fame.md", icon: "🏆", title: "Hall of Fame", stat: `${unlockedCount} Badges` },
-            { path: "01_Dashboard/02_Shop.md", icon: "🛒", title: "Shop", stat: "Market" },
-            { path: "01_Dashboard/03_Backpack.md", icon: "🎒", title: "Inventory", stat: "Items" }
+            { path: "01_Dashboard/00_Profile.md", icon: "👤", title: "Profile", stat: "Analytics" },
+            { path: "01_Dashboard/01_Hall_of_Fame.md", icon: "🏆", title: "Hall of Fame", stat: `${unlockedCount} Rewards` },
+            { path: "01_Dashboard/02_Shop.md", icon: "🛒", title: "Shop", stat: "Merchant" },
+            { path: "01_Dashboard/03_Backpack.md", icon: "🎒", title: "Backpack", stat: "Items" }
         ];
         links.forEach(l => {
             const card = navRow.createEl('a', { cls: 'nav-card', attr: { href: l.path } });
@@ -167,10 +181,10 @@ banner: https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format
         });
 
         const calPanel = root.createEl('div', { cls: 'block-panel' });
-        calPanel.createEl('h4', { cls: 'panel-header', text: "📅 Scroll of Chronology (" + window.moment().format("MMMM YYYY") + ")" });
+        calPanel.createEl('h4', { cls: 'panel-header', text: "📅 Chronology Scroll (" + window.moment().format("MMMM YYYY") + ")" });
         
         const matrix = calPanel.createEl('div', { cls: 'matrix-calendar' });
-        const dayNames = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+        const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
         dayNames.forEach(d => matrix.createEl('div', { cls: 'matrix-header', text: d }));
 
         const now = new Date();
@@ -205,9 +219,9 @@ banner: https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format
                 if (file) {
                     app.workspace.getLeaf(false).openFile(file);
                 } else {
-                    new Notice(`⏳ Generating quest scroll for ${loopDateStr}...`);
+                    new Notice(`⏳ Creating quest scroll for ${loopDateStr}...`);
                     try {
-                        const TEMPLATE_PATH = "06_Templates/Daily Note Template.md"; 
+                        const TEMPLATE_PATH = "00_System/Daily Note Template.md"; 
                         const templateFile = app.vault.getAbstractFileByPath(TEMPLATE_PATH);
                         
                         if (!templateFile) {
@@ -221,14 +235,14 @@ banner: https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format
                         const newFile = await app.vault.create(targetPath, templateContent);
                         app.workspace.getLeaf(false).openFile(newFile);
                     } catch(err) {
-                        new Notice("Generation error: " + err.message);
+                        new Notice("File generation error: " + err.message);
                     }
                 }
             });
         }
 
         const lootPanel = root.createEl('div', { cls: 'block-panel' });
-        lootPanel.createEl('h4', { cls: 'panel-header', text: "🧠 Knowledge Forge (Recent Concepts)" });
+        lootPanel.createEl('h4', { cls: 'panel-header', text: "🧠 Forge of Knowledge (Latest concepts)" });
         
         const lootWrapper = lootPanel.createEl('div', { cls: 'loot-wrapper' });
         const zettels = dv.pages('"04_Zettelkasten"').where(p => p.file.folder.includes('02_Concepts')).sort(p => p.file.ctime, "desc").slice(0, 4);
@@ -244,7 +258,7 @@ banner: https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format
                     app.workspace.getLeaf(false).openFile(app.vault.getAbstractFileByPath(z.file.path));
                 });
                 
-                headerDiv.createEl('span', { cls: 'loot-date', text: window.moment(z.file.ctime.toString()).format("DD.MM") });
+                headerDiv.createEl('span', { cls: 'loot-date', text: z.file.ctime.toFormat("dd.MM") });
             });
         } else {
             lootPanel.createEl('div', { text: "No trophies found.", attr: { style: "font-size:0.85em; color:var(--text-muted); font-style:italic;" } });
@@ -271,16 +285,16 @@ banner: https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format
             }
         }
         if (!hasQuests) {
-            qPanel.createEl('div', { text: "All quests completed or journal has not been started today.", attr: { style: "font-size:0.85em; color:var(--text-muted); font-style:italic; text-align:center; padding: 10px 0;" } });
+            qPanel.createEl('div', { text: "All tasks completed or daily journal not started yet.", attr: { style: "font-size:0.85em; color:var(--text-muted); font-style:italic; text-align:center; padding: 10px 0;" } });
         }
 
         const footer = root.createEl('div');
-        const mainLaunchBtn = footer.createEl('button', { cls: 'launch-action-btn', text: "📜 Open Time Control Panel" });
+        const mainLaunchBtn = footer.createEl('button', { cls: 'launch-action-btn', text: "📜 Open Time Management Console" });
         mainLaunchBtn.addEventListener('click', () => {
             const path = `05_Journal/${todayStr}.md`;
             const file = app.vault.getAbstractFileByPath(path);
             if (file) app.workspace.getLeaf(false).openFile(file);
-            else new Notice("⚠️ Journal for today hasn't been created yet!");
+            else new Notice("⚠️ Today's journal hasn't been created yet!");
         });
 
     } catch (e) {

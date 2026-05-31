@@ -14,7 +14,6 @@ unlocked_badges: []
 
     try {
         const engine = customJS.RPG_Engine;
-       
         const PROFILE_PATH = "01_Dashboard/00_Profile.md";
         const profilePage = dv.page(PROFILE_PATH);
         const profileFile = app.vault.getAbstractFileByPath(PROFILE_PATH);
@@ -41,57 +40,52 @@ unlocked_badges: []
 
         const totalQuests = ctx.counters.totalTasks;
         const totalZk = ctx.zettelCount || 0;
-        const currentGold = ctx.currentGold || 0;
         const totalProcrastinate = (ctx.globalTimeStats && ctx.globalTimeStats.totalProcrastinateMinutes) ? ctx.globalTimeStats.totalProcrastinateMinutes : 0;
 
         const categories = {
-            "focus": { title: "⏳ Mastery of Focus", desc: "Milestones achieved through deep focus time allocation.", bg: "rgba(255, 255, 255, 0.02)" },
-            "quests": { title: "⚔️ Quest Discipline", desc: "Rewards based on total completed checkmark objectives.", bg: "rgba(255, 255, 255, 0.02)" },
-            "zk": { title: "🧠 Second Brain (Zettelkasten)", desc: "Progress for constructing atomic conceptual knowledge cards.", bg: "rgba(255, 255, 255, 0.02)" },
-            "eco": { title: "⚖️ Capital Wealth", desc: "The grand scaling threshold of your financial wallet accumulation.", bg: "rgba(255, 255, 255, 0.02)" },
-            "shame": { title: "💀 Avenue of Shame", desc: "Ironic satirical labels for extreme procrastination.", bg: "rgba(231, 76, 60, 0.02)" }
+            "focus": { title: "⏳ Focus Mastery", desc: "Rewards for total pure focus time.", bg: "rgba(255, 255, 255, 0.02)" },
+            "quests": { title: "⚔️ Quest Discipline", desc: "Rewards for successfully completed tasks.", bg: "rgba(255, 255, 255, 0.02)" },
+            "zk": { title: "🧠 Neural Network (Zettelkasten)", desc: "Progress in creating knowledge cards.", bg: "rgba(255, 255, 255, 0.02)" },
+            "eco": { title: "⚖️ Financial Capital", desc: "The scale of your current gold reserves in the wallet.", bg: "rgba(255, 255, 255, 0.02)" },
+            "shame": { title: "💀 Hall of Shame", desc: "Ironic titles for wasted time.", bg: "rgba(231, 76, 60, 0.02)" }
         };
 
         const allAchievements = [
-            { id: "f_1", cat: "focus", type: "auto", icon: "🥉", title: "First Blood", desc: "Log 1 hour of total focus activity", req: 1, current: totalFocusHours, rewardXp: 50, rewardGp: 25 },
-            { id: "f_5", cat: "focus", type: "auto", icon: "🥉", title: "Warming Up", desc: "Log 5 hours of total focus activity", req: 5, current: totalFocusHours, rewardXp: 100, rewardGp: 50 },
-            { id: "f_10", cat: "focus", type: "auto", icon: "🥈", title: "Apprentice", desc: "Log 10 hours of total focus activity", req: 10, current: totalFocusHours, rewardXp: 200, rewardGp: 100 },
-            { id: "f_25", cat: "focus", type: "auto", icon: "🥈", title: "Deep Worker", desc: "Log 25 hours of total focus activity", req: 25, current: totalFocusHours, rewardXp: 350, rewardGp: 150 },
-            { id: "f_50", cat: "focus", type: "auto", icon: "🥇", title: "Iron Will", desc: "Log 50 hours of total focus activity", req: 50, current: totalFocusHours, rewardXp: 500, rewardGp: 250 },
-            { id: "f_100", cat: "focus", type: "auto", icon: "🏅", title: "Truth Seeker", desc: "Log 100 hours of total focus activity", req: 100, current: totalFocusHours, rewardXp: 1000, rewardGp: 500 },
-            { id: "f_250", cat: "focus", type: "auto", icon: "💠", title: "Flow Lord", desc: "Log 250 hours of total focus activity", req: 250, current: totalFocusHours, rewardXp: 2000, rewardGp: 1000 },
-            { id: "f_500", cat: "focus", type: "auto", icon: "💎", title: "Time Archmage", desc: "Log 500 hours of total focus activity", req: 500, current: totalFocusHours, rewardXp: 3000, rewardGp: 1500 },
-            { id: "f_1000", cat: "focus", type: "auto", icon: "🌌", title: "Reality Warper", desc: "Log 1000 hours of total focus activity", req: 1000, current: totalFocusHours, rewardXp: 6000, rewardGp: 3000 },
-            { id: "f_5000", cat: "focus", type: "auto", icon: "👑", title: "The Absolute", desc: "Log 5000 hours of total focus activity", req: 5000, current: totalFocusHours, rewardXp: 25000, rewardGp: 10000 },
-            
-            { id: "q_1", cat: "quests", type: "auto", icon: "📝", title: "First Step", desc: "Complete 1 objective task", req: 1, current: totalQuests, rewardXp: 10, rewardGp: 10 },
-            { id: "q_10", cat: "quests", type: "auto", icon: "📝", title: "Gaining Momentum", desc: "Complete 10 objective tasks", req: 10, current: totalQuests, rewardXp: 50, rewardGp: 25 },
-            { id: "q_50", cat: "quests", type: "auto", icon: "⚔️", title: "Guild Rookie", desc: "Complete 50 objective tasks", req: 50, current: totalQuests, rewardXp: 100, rewardGp: 50 },
-            { id: "q_100", cat: "quests", type: "auto", icon: "🛡️", title: "Mercenary", desc: "Complete 100 objective tasks", req: 100, current: totalQuests, rewardXp: 250, rewardGp: 125 },
-            { id: "q_250", cat: "quests", type: "auto", icon: "🎯", title: "Bounty Hunter", desc: "Complete 250 objective tasks", req: 250, current: totalQuests, rewardXp: 500, rewardGp: 250 },
-            { id: "q_500", cat: "quests", type: "auto", icon: "🦅", title: "Schedule Scourge", desc: "Complete 500 objective tasks", req: 500, current: totalQuests, rewardXp: 1000, rewardGp: 500 },
-            { id: "q_1000", cat: "quests", type: "auto", icon: "🗡️", title: "Task Terminator", desc: "Complete 1000 objective tasks", req: 1000, current: totalQuests, rewardXp: 2500, rewardGp: 1250 },
-            { id: "q_5000", cat: "quests", type: "auto", icon: "🌋", title: "Efficiency Machine", desc: "Complete 5000 objective tasks", req: 5000, current: totalQuests, rewardXp: 12000, rewardGp: 5000 },
-            
-            { id: "z_10", cat: "zk", type: "auto", icon: "💡", title: "Spark of Concept", desc: "Create 10 zettel concepts", req: 10, current: totalZk, rewardXp: 100, rewardGp: 50 },
-            { id: "z_50", cat: "zk", type: "auto", icon: "📂", title: "Archivist", desc: "Create 50 zettel concepts", req: 50, current: totalZk, rewardXp: 250, rewardGp: 125 },
-            { id: "z_100", cat: "zk", type: "auto", icon: "📖", title: "Library Overseer", desc: "Create 100 zettel concepts", req: 100, current: totalZk, rewardXp: 800, rewardGp: 400 },
-            { id: "z_250", cat: "zk", type: "auto", icon: "👁️", title: "Structured Mind", desc: "Create 250 zettel concepts", req: 250, current: totalZk, rewardXp: 1500, rewardGp: 750 },
-            { id: "z_500", cat: "zk", type: "auto", icon: "🕸️", title: "Mind Architect", desc: "Create 500 zettel concepts", req: 500, current: totalZk, rewardXp: 3000, rewardGp: 1500 },
-            { id: "z_1000", cat: "zk", type: "auto", icon: "🧠", title: "The Second Brain", desc: "Create 1000 zettel concepts", req: 1000, current: totalZk, rewardXp: 6000, rewardGp: 3000 },
-            { id: "z_2000", cat: "zk", type: "auto", icon: "🌌", title: "Digital Demiurge", desc: "Create 2000 zettel concepts", req: 2000, current: totalZk, rewardXp: 10000, rewardGp: 5000 },
-            { id: "z_5000", cat: "zk", type: "auto", icon: "🌐", title: "Cosmic Intellect", desc: "Create 5000 zettel concepts", req: 5000, current: totalZk, rewardXp: 25000, rewardGp: 10000 },
-            
-            { id: "e_100", cat: "eco", type: "auto", icon: "👛", title: "First Wealth", desc: "Hold 100 current GP in wallet", req: 100, current: currentGold, rewardXp: 50, rewardGp: 0 },
-            { id: "e_500", cat: "eco", type: "auto", icon: "👛", title: "Safe Box", desc: "Hold 500 current GP in wallet", req: 500, current: currentGold, rewardXp: 150, rewardGp: 0 },
-            { id: "e_1k", cat: "eco", type: "auto", icon: "💰", title: "Capitalist", desc: "Hold 1000 current GP in wallet", req: 1000, current: currentGold, rewardXp: 500, rewardGp: 0 },
-            { id: "e_2.5k", cat: "eco", type: "auto", icon: "💰", title: "Affluent Mage", desc: "Hold 2500 current GP in wallet", req: 2500, current: currentGold, rewardXp: 1000, rewardGp: 0 },
-            { id: "e_5k", cat: "eco", type: "auto", icon: "🏦", title: "Tycoon", desc: "Hold 5000 current GP in wallet", req: 5000, current: currentGold, rewardXp: 2000, rewardGp: 0 },
-            
-            { id: "s_1", cat: "shame", type: "irony", icon: "🤡", title: "Traces of Laziness", desc: "Accumulate 1 hour of total waste time", req: 60, current: totalProcrastinate, rewardXp: 0, rewardGp: 0 },
-            { id: "s_10", cat: "shame", type: "irony", icon: "🤡", title: "TikTok Sponsor", desc: "Accumulate 10 hours of total waste time", req: 600, current: totalProcrastinate, rewardXp: 0, rewardGp: 0 },
-            { id: "s_50", cat: "shame", type: "irony", icon: "🛋️", title: "Couch Knight", desc: "Accumulate 50 hours of total waste time", req: 3000, current: totalProcrastinate, rewardXp: 0, rewardGp: 0 },
-            { id: "s_100", cat: "shame", type: "irony", icon: "🧟", title: "Sofa Warlord", desc: "Accumulate 100 hours of total waste time", req: 6000, current: totalProcrastinate, rewardXp: 0, rewardGp: 0 }
+            { id: "f_1", cat: "focus", type: "auto", icon: "🥉", title: "First Blood", desc: "Gain 1 hour of focus", req: 1, current: totalFocusHours, rewardXp: 50, rewardGp: 25 },
+            { id: "f_5", cat: "focus", type: "auto", icon: "🥉", title: "Getting Started", desc: "Gain 5 hours of focus", req: 5, current: totalFocusHours, rewardXp: 100, rewardGp: 50 },
+            { id: "f_10", cat: "focus", type: "auto", icon: "🥈", title: "Intern", desc: "Gain 10 hours of focus", req: 10, current: totalFocusHours, rewardXp: 200, rewardGp: 100 },
+            { id: "f_25", cat: "focus", type: "auto", icon: "🥈", title: "Nerd Habit", desc: "Gain 25 hours of focus", req: 25, current: totalFocusHours, rewardXp: 350, rewardGp: 150 },
+            { id: "f_50", cat: "focus", type: "auto", icon: "🥇", title: "Iron Will", desc: "Gain 50 hours of focus", req: 50, current: totalFocusHours, rewardXp: 500, rewardGp: 250 },
+            { id: "f_100", cat: "focus", type: "auto", icon: "🏅", title: "Truth Seeker", desc: "Gain 100 hours of focus", req: 100, current: totalFocusHours, rewardXp: 1000, rewardGp: 500 },
+            { id: "f_250", cat: "focus", type: "auto", icon: "💠", title: "Flow Master", desc: "Gain 250 hours of focus", req: 250, current: totalFocusHours, rewardXp: 2000, rewardGp: 1000 },
+            { id: "f_500", cat: "focus", type: "auto", icon: "💎", title: "Time Magus", desc: "Gain 500 hours of focus", req: 500, current: totalFocusHours, rewardXp: 3000, rewardGp: 1500 },
+            { id: "f_1000", cat: "focus", type: "auto", icon: "🌌", title: "Reality Warper", desc: "Gain 1000 hours of focus", req: 1000, current: totalFocusHours, rewardXp: 6000, rewardGp: 3000 },
+            { id: "f_5000", cat: "focus", type: "auto", icon: "👑", title: "The Absolute", desc: "Gain 5000 hours of focus", req: 5000, current: totalFocusHours, rewardXp: 25000, rewardGp: 10000 },
+            { id: "q_1", cat: "quests", type: "auto", icon: "📝", title: "First Step", desc: "Complete 1 quest", req: 1, current: totalQuests, rewardXp: 10, rewardGp: 10 },
+            { id: "q_10", cat: "quests", type: "auto", icon: "📝", title: "Gaining Momentum", desc: "Complete 10 quests", req: 10, current: totalQuests, rewardXp: 50, rewardGp: 25 },
+            { id: "q_50", cat: "quests", type: "auto", icon: "⚔️", title: "Guild Novice", desc: "Complete 50 quests", req: 50, current: totalQuests, rewardXp: 100, rewardGp: 50 },
+            { id: "q_100", cat: "quests", type: "auto", icon: "🛡️", title: "Mercenary", desc: "Complete 100 quests", req: 100, current: totalQuests, rewardXp: 250, rewardGp: 125 },
+            { id: "q_250", cat: "quests", type: "auto", icon: "🎯", title: "Bounty Hunter", desc: "Complete 250 quests", req: 250, current: totalQuests, rewardXp: 500, rewardGp: 250 },
+            { id: "q_500", cat: "quests", type: "auto", icon: "🦅", title: "Schedule Terror", desc: "Complete 500 quests", req: 500, current: totalQuests, rewardXp: 1000, rewardGp: 500 },
+            { id: "q_1000", cat: "quests", type: "auto", icon: "🗡️", title: "Task Terminator", desc: "Complete 1000 quests", req: 1000, current: totalQuests, rewardXp: 2500, rewardGp: 1250 },
+            { id: "q_5000", cat: "quests", type: "auto", icon: "🌋", title: "Efficiency Machine", desc: "Complete 5000 quests", req: 5000, current: totalQuests, rewardXp: 12000, rewardGp: 5000 },
+            { id: "z_10", cat: "zk", type: "auto", icon: "💡", title: "Spark of Knowledge", desc: "Create 10 conceptual notes", req: 10, current: totalZk, rewardXp: 100, rewardGp: 50 },
+            { id: "z_50", cat: "zk", type: "auto", icon: "📂", title: "Archivist", desc: "Create 50 conceptual notes", req: 50, current: totalZk, rewardXp: 250, rewardGp: 125 },
+            { id: "z_100", cat: "zk", type: "auto", icon: "📖", title: "Library Keeper", desc: "Create 100 conceptual notes", req: 100, current: totalZk, rewardXp: 800, rewardGp: 400 },
+            { id: "z_250", cat: "zk", type: "auto", icon: "👁️", title: "Thought Structure", desc: "Create 250 conceptual notes", req: 250, current: totalZk, rewardXp: 1500, rewardGp: 750 },
+            { id: "z_500", cat: "zk", type: "auto", icon: "🕸️", title: "Mind Architect", desc: "Create 500 conceptual notes", req: 500, current: totalZk, rewardXp: 3000, rewardGp: 1500 },
+            { id: "z_1000", cat: "zk", type: "auto", icon: "🧠", title: "Second Brain", desc: "Create 1000 conceptual notes", req: 1000, current: totalZk, rewardXp: 6000, rewardGp: 3000 },
+            { id: "z_2000", cat: "zk", type: "auto", icon: "🌌", title: "Digital Demiurge", desc: "Create 2000 conceptual notes", req: 2000, current: totalZk, rewardXp: 10000, rewardGp: 5000 },
+            { id: "z_5000", cat: "zk", type: "auto", icon: "🌐", title: "Universal Mind", desc: "Create 5000 conceptual notes", req: 5000, current: totalZk, rewardXp: 25000, rewardGp: 10000 },
+            { id: "e_100", cat: "eco", type: "auto", icon: "👛", title: "First Capital", desc: "Accumulate 100 GP", req: 100, current: ctx.currentGold, rewardXp: 50, rewardGp: 0 },
+            { id: "e_500", cat: "eco", type: "auto", icon: "👛", title: "Piggy Bank", desc: "Accumulate 500 GP", req: 500, current: ctx.currentGold, rewardXp: 150, rewardGp: 0 },
+            { id: "e_1k", cat: "eco", type: "auto", icon: "💰", title: "Capitalist", desc: "Accumulate 1000 GP", req: 1000, current: ctx.currentGold, rewardXp: 500, rewardGp: 0 },
+            { id: "e_2.5k", cat: "eco", type: "auto", icon: "💰", title: "Wealthy Mage", desc: "Accumulate 2500 GP", req: 2500, current: ctx.currentGold, rewardXp: 1000, rewardGp: 0 },
+            { id: "e_5k", cat: "eco", type: "auto", icon: "🏦", title: "Tycoon", desc: "Accumulate 5000 GP", req: 5000, current: ctx.currentGold, rewardXp: 2000, rewardGp: 0 },
+            { id: "s_1", cat: "shame", type: "irony", icon: "🤡", title: "Smells Like Laziness", desc: "Waste your first hour on procrastination", req: 60, current: totalProcrastinate, rewardXp: 0, rewardGp: 0 },
+            { id: "s_10", cat: "shame", type: "irony", icon: "🤡", title: "TikTok Sponsor", desc: "Accumulate 10 hours of procrastination", req: 600, current: totalProcrastinate, rewardXp: 0, rewardGp: 0 },
+            { id: "s_50", cat: "shame", type: "irony", icon: "🛋️", title: "Couch Knight", desc: "Accumulate 50 hours of procrastination", req: 3000, current: totalProcrastinate, rewardXp: 0, rewardGp: 0 },
+            { id: "s_100", cat: "shame", type: "irony", icon: "🧟", title: "General of the Couch Army", desc: "Accumulate 100 hours of procrastination", req: 6000, current: totalProcrastinate, rewardXp: 0, rewardGp: 0 }
         ];
 
         const renderOrder = ["focus", "quests", "zk", "eco", "shame"];
@@ -186,9 +180,6 @@ unlocked_badges: []
                     btn.innerText = ach.type === 'irony' ? "SHAMEFUL" : "CLAIM";
                     
                     btn.addEventListener('click', async () => {
-                        if (window.isRPGTransactionActive) return;
-                        window.isRPGTransactionActive = true;
-                        
                         btn.disabled = true; 
                         btn.innerText = "⏳ ...";
                         
@@ -205,19 +196,15 @@ unlocked_badges: []
                                 });
                             }
 
+                            engine.invalidateCache(); 
                             new Notice("Reward claimed: " + ach.title);
-                            setTimeout(() => { 
-                                if (btn && document.body.contains(btn)) {
-                                    btn.innerText = "🏆 UNLOCKED"; 
-                                    btn.style.cssText = "width: 100%; padding: 6px 10px; border-radius: 5px; font-weight: bold; font-size: 0.8em; background: transparent; color: #f1c40f; border: 1px solid #f1c40f; cursor: default;"; 
-                                }
-                                window.isRPGTransactionActive = false;
-                            }, 500);
                         } catch (err) {
-                            new Notice("Save error: " + err.message);
+                            new Notice("Error while saving: " + err.message);
                             btn.disabled = false;
-                            btn.innerText = "ERROR";
-                            window.isRPGTransactionActive = false;
+                        } finally {
+                            setTimeout(() => {
+                                app.commands.executeCommandById("dataview:dataview-refresh-views");
+                            }, 100);
                         }
                     });
                 } else {
